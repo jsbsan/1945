@@ -1,0 +1,544 @@
+' Gambas class file
+
+Public ciclo As Integer
+Public miAvion As Sprite
+
+Public grupoAviones As New Sprite[]
+Public grupoDisparosPropios As New Sprite[]
+Public grupoDisparosEnemigos As New Sprite[]
+Public grupoExplosiones As New Sprite[]
+Public findeljuego As Boolean
+Public fondo As CapaFondo
+
+' by Terco
+' Public joy1 As New JoyStick(Me)
+Public JoyStickReady As Boolean = True
+
+Public Sub Form_Open()
+
+  Randomize
+
+  DrawingArea1.SetFocus()
+  'crear aviones
+  crearAviones()
+  'fondo de pantalla Mapa
+  fondo = New CapaFondo(DrawingArea1, "fondo/mapa1.txt")
+
+  TimerRedibujar.Trigger()
+  TimerRedibujar.Delay = 10
+  TimerRedibujar.Start()
+  Me.Center()
+
+End
+
+Public Sub DrawingArea1_Draw()
+  'dibujar los objetos que haya....
+
+  Dim aviontmp As Sprite
+  Dim disparo As Sprite
+  Dim explosion As Explode
+  'dubjar elementos de la pantalla
+  fondo.dibuja()
+
+  For Each aviontmp In grupoAviones
+    aviontmp.dibuja()
+  Next
+
+  For Each disparo In grupoDisparosPropios
+    disparo.dibuja()
+  Next
+
+  For Each disparo In grupoDisparosEnemigos
+    disparo.dibuja()
+  Next
+
+  For Each explosion In grupoExplosiones
+    explosion.dibuja()
+  Next
+
+End
+
+Public Sub TimerRedibujar_Timer()
+
+  Dim aviontmp As Sprite
+  Dim disparotmp As Sprite
+  Dim explosion As Explode
+
+  If ciclo > 200 Then
+    creaenemigo()
+    ciclo = 0
+  Else
+    ciclo += 1
+  Endif
+
+  'mover los aviones....
+  For Each aviontmp In grupoAviones
+    aviontmp.mover()
+  Next
+
+  'mover disparos
+  For Each disparotmp In grupoDisparosPropios
+    disparotmp.mover()
+  Next
+
+  'mover disparos enemigos
+  For Each disparotmp In grupoDisparosEnemigos
+    disparotmp.mover()
+  Next
+
+  analizaColisiones()
+  'mover explosiones
+  For Each explosion In grupoExplosiones
+    explosion.mover()
+  Next
+
+  DrawingArea1.Refresh()
+
+End
+
+Public Sub Form_KeyPress()
+
+  If miavion.isactive() Then
+
+    Select Case Key.Code
+      Case Key.Left
+        miAvion.incrementoX(-1)
+      Case Key.Right
+        miAvion.incrementoX(+1)
+      Case Key.Up
+        miAvion.incrementoy(-1)
+      Case Key.Down
+        miAvion.incrementoy(+2)
+
+      Case Key.enter, Key.Return, Key.Space
+        disparar(miavion, True)
+        Debug "Shoot" & Rnd(1, 100)
+
+    End Select
+
+  Else
+    ButtonIniciar.SetFocus()
+  Endif
+
+End
+
+' By Terco
+Public Sub joy1_OnJoystick()
+
+  'Public Sub tmrJoystick_Timer()
+
+  If Not JoyStickReady Then Return
+  If miavion.isactive() Then
+
+    ' aqui agarramos eventos del joystick
+    If joy1.UpState > 0 Then
+
+      miAvion.incrementoY(-1)
+
+    Else If joy1.DownState > 0 Then
+      miAvion.incrementoY(+2)
+
+    Else If joy1.RightState > 0 Then
+
+      miAvion.incrementoX(+1)
+
+    Else If joy1.LeftState > 0 Then
+      miAvion.incrementoX(-1)
+
+    End If
+
+    If joy1.HoldButton0() Then
+      disparar(miavion, True)
+
+    End If
+  Else
+    ButtonIniciar.SetFocus()
+  Endif
+
+End
+
+Public Sub crearAviones()
+
+  Dim avionTmp As Sprite
+  '---------------------------
+  'avion jugador
+  '---------------------------
+
+  avionTmp = New AvionControlado(1)
+  avionTmp.addFrame(1, "aviones/avion1.png")
+  avionTmp.setX(DrawingArea1.w / 2) 'pongo el avion en la mitad de la pantalla
+  avionTmp.sety(DrawingArea1.h * 3 / 4) 'pongo el avion en la mitad de la pantalla
+  'movimiento inicial del avion
+  avionTmp.ZonaDibujoAlto(DrawingArea1.h)
+  avionTmp.ZonaDibujoAncho(DrawingArea1.w)
+  avionTmp.incrementoY(0)
+  aviontmp.on()
+  grupoAviones.add(avionTmp)
+  miAvion = avionTmp
+
+  '-------------------------------
+  'creo un enemigo...
+  '-------------------------------
+  avionTmp = Null
+  avionTmp = New AvionEnemigo(2)
+  avionTmp.addFrame(1, "aviones/avionEnemigo1.png")
+  avionTmp.addFrame(2, "aviones/avionEnemigo1b.png")
+  avionTmp.setX(DrawingArea1.w / 2) 'pongo el avion en la mitad de la pantalla
+  avionTmp.sety(0)
+  'movimiento inicial del avion
+  avionTmp.ZonaDibujoAlto(DrawingArea1.h)
+  avionTmp.ZonaDibujoAncho(DrawingArea1.w)
+  avionTmp.incrementoY(+1)
+  avionTmp.tipo = 2
+
+  aviontmp.on()
+  grupoAviones.add(avionTmp)
+
+  '-------------------------------
+  'creo un enemigo...
+  '-------------------------------
+  avionTmp = Null
+  avionTmp = New AvionEnemigo(2)
+  avionTmp.addFrame(1, "aviones/avionEnemigo1.png")
+  avionTmp.addFrame(2, "aviones/avionEnemigo1b.png")
+  avionTmp.setX(DrawingArea1.w - 80) 'pongo el avion en la mitad de la pantalla
+  avionTmp.sety(0) 'pongo el avion en la mitad de la pantalla
+
+  avionTmp.ZonaDibujoAlto(DrawingArea1.h)
+  avionTmp.ZonaDibujoAncho(DrawingArea1.w)
+  avionTmp.tipo = 2
+  'movimiento inicial del avion
+  avionTmp.incrementoY(+1)
+  aviontmp.on()
+  grupoAviones.add(avionTmp)
+
+End
+
+'--------------------------------
+'crea enemigo
+'--------------------------------
+Public Sub creaenemigo()
+
+  Dim modelo As String
+  Dim a As Integer
+  Dim avionTmp As Sprite
+  Dim freeEnemigo As Integer = 0
+
+  'si no he superado un total de 7 aviones
+  If grupoAviones.count < 5 Then
+    avionTmp = Null
+    avionTmp = New AvionEnemigo(2)
+    modelo = eligemodelo()
+    avionTmp.addFrame(1, modelo & ".png")
+    avionTmp.addFrame(2, modelo & "b.png")
+
+    avionTmp.setX(Rnd(0, DrawingArea1.w - 80)) 'pongo el avion en la mitad de la pantalla
+    avionTmp.sety(0) 'pongo el avion en la mitad de la pantalla
+    avionTmp.estado = 0
+    avionTmp.tipo = Int(Rnd(1, 10) / 5) + 1 'eligo aleatoriamente tipo 1 o 2
+    avionTmp.incrementox(0)
+    avionTmp.ZonaDibujoAlto(DrawingArea1.h)
+    avionTmp.ZonaDibujoAncho(DrawingArea1.w)
+    'movimiento inicial del avion
+    avionTmp.incrementoY(+1)
+    aviontmp.on()
+    grupoAviones.add(avionTmp)
+    Return
+  Endif
+
+  'busco elemento del array que este libre
+  For a = 1 To grupoAviones.Count - 1 'no empiezo por el 0 ya que es el avion jugador
+    '   Print "busco avion libre: ", grupoAviones[a].isactive(), grupoAviones[a].active
+    If grupoAviones[a].active = False Then
+      freeEnemigo = a
+      Break
+    Endif
+  Next
+
+  If freeEnemigo <> 0 Then
+    grupoAviones[freeEnemigo].on()
+    grupoAviones[freeEnemigo].tipo = Int(Rnd(1, 10) / 5) + 1 'eligo aleatoriamente tipo 1 o 2
+    grupoAviones[freeEnemigo].estado = 0
+    modelo = eligemodelo()
+    grupoAviones[freeEnemigo].addFrame(1, modelo & ".png")
+    grupoAviones[freeEnemigo].addFrame(2, modelo & "b.png")
+    grupoAviones[freeEnemigo].setX(Rnd(DrawingArea1.w / 4, DrawingArea1.w / 4 * 3)) 'pongo el avion en la mitad de la pantalla
+    grupoAviones[freeEnemigo].sety(0) 'pongo el avion en la mitad de la pantalla
+    grupoAviones[freeEnemigo].incrementox(0)
+    'movimiento inicial del avion
+    If grupoAviones[freeEnemigo].tipo = 1 Then
+      grupoAviones[freeEnemigo].incrementoY(+2)
+    Else
+      grupoAviones[freeEnemigo].incrementoY(+1)
+    Endif
+
+  Endif
+
+End
+
+Public Sub eligemodelo() As String
+
+  Dim valor As Integer = Int(Rnd(1, 100))
+
+  If valor < 33 Then
+    Return "aviones/avionEnemigo1"
+  Else
+    If valor < 66 Then
+
+      Return "aviones/avionEnemigo2"
+    Else
+      Return "aviones/avionEnemigo4"
+    Endif
+  Endif
+
+End
+
+'------------------ disparos ------------------------
+Public Sub disparar(avion As Sprite, mio As Boolean)
+
+  If mio = True Then
+    HacerdisparoPropio(avion)
+  Else
+    HacerDisparoEnemigo(avion)
+  Endif
+
+End
+
+Public Sub HacerdisparoPropio(avion As Sprite)
+
+  Dim a As Integer
+  Dim disparoTmp As Bullet
+  Dim freedisparo1 As Integer = -1
+  Dim freedisparo2 As Integer = -1
+
+  If grupoDisparosPropios.count < 6 Then
+    disparoTmp = Null
+    disparoTmp = New Bullet(1)
+    disparoTmp.addFrame(1, "disparo1.png")
+    disparoTmp.setX(avion.getx())
+    disparoTmp.sety(avion.gety())
+    disparoTmp.ZonaDibujoAlto(DrawingArea1.h)
+    disparoTmp.ZonaDibujoAncho(DrawingArea1.w)
+    disparoTmp.setOwner(True)
+    'si no fuera mio
+    'disparoTmp.setOwner(False)
+    disparoTmp.on()
+    grupoDisparosPropios.Add(disparoTmp)
+
+    '---------------------------
+    'doble disparo...
+    '---------------------------
+    disparoTmp = Null
+
+    disparoTmp = New Bullet(1)
+    disparoTmp.addFrame(1, "disparo1.png")
+    disparoTmp.setX(avion.getx() + avion.getW() - 20)
+    disparoTmp.sety(avion.gety())
+    disparoTmp.ZonaDibujoAlto(DrawingArea1.h)
+    disparoTmp.ZonaDibujoAncho(DrawingArea1.w)
+
+    disparoTmp.setOwner(True)
+    disparoTmp.on()
+
+    grupoDisparosPropios.Add(disparoTmp)
+    Return
+  Endif
+  'sino busco elementos de array que esten libres:
+  For a = 0 To grupoDisparosPropios.count - 1
+    If grupoDisparosPropios[a].active = False Then
+      freedisparo1 = a
+      Break
+    Endif
+  Next
+
+  For a = freedisparo1 + 1 To grupoDisparosPropios.count - 1
+    If grupoDisparosPropios[a].active = False Then
+      freedisparo2 = a
+      Break
+    Endif
+  Next
+
+  If freedisparo1 > -1 Then
+    disparotmp = grupoDisparosPropios[freedisparo1]
+    disparoTmp.setX(avion.getx())
+    disparoTmp.sety(avion.gety())
+    'disparoTmp.ZonaDibujoAlto(DrawingArea1.h)
+    'disparoTmp.ZonaDibujoAncho(DrawingArea1.w)
+    disparoTmp.setOwner(True)
+    disparoTmp.on()
+  Endif
+
+  If freedisparo2 > -1 Then
+    disparotmp = grupoDisparosPropios[freedisparo2]
+    disparoTmp.addFrame(1, "disparo1.png")
+    disparoTmp.setX(avion.getx() + avion.getW() - 20)
+    disparoTmp.sety(avion.gety())
+    'disparoTmp.ZonaDibujoAlto(DrawingArea1.h)
+    ' disparoTmp.ZonaDibujoAncho(DrawingArea1.w)
+    disparoTmp.setOwner(True)
+    disparoTmp.on()
+  Endif
+
+End
+
+Public Sub HacerDisparoEnemigo(avion As Sprite)
+
+  Dim a As Integer
+  Dim disparoTmp As Bullet
+  Dim freedisparo1 As Integer = -1
+  Dim freedisparo2 As Integer = -1
+
+  If grupoDisparosEnemigos.count < 30 Then
+    disparoTmp = Null
+    disparoTmp = New Bullet(1)
+    disparoTmp.addFrame(1, "disparoEnemigo.png")
+    disparoTmp.setX(avion.getx())
+    disparoTmp.sety(avion.gety())
+    disparoTmp.ZonaDibujoAlto(DrawingArea1.h)
+    disparoTmp.ZonaDibujoAncho(DrawingArea1.w)
+    'si no fuera mio
+    disparoTmp.setOwner(False)
+    disparoTmp.on()
+    grupoDisparosEnemigos.Add(disparoTmp)
+
+    Return
+  Endif
+  'sino busco elementos de array que esten libres:
+  For a = 0 To grupoDisparosEnemigos.count - 1
+    If grupoDisparosEnemigos[a].active = False Then
+      freedisparo1 = a
+      Break
+    Endif
+  Next
+
+  If freedisparo1 > -1 Then
+    disparotmp = grupoDisparosEnemigos[freedisparo1]
+    disparoTmp.setX(avion.getx())
+    disparoTmp.sety(avion.gety())
+    'disparoTmp.ZonaDibujoAlto(DrawingArea1.h)
+    'disparoTmp.ZonaDibujoAncho(DrawingArea1.w)
+    disparoTmp.setOwner(False)
+    disparoTmp.on()
+  Endif
+
+End
+
+Public Sub CrearExplosion(posx As Integer, posy As Integer)
+
+  Dim explosion As Explode
+
+  explosion = New Explode(1)
+  explosion.addMultipleFrame("explosion.png", 1, 12)
+  explosion.setX(posx)
+  explosion.sety(posy)
+
+  explosion.ZonaDibujoAlto(DrawingArea1.h)
+  explosion.ZonaDibujoAncho(DrawingArea1.w)
+  explosion.on()
+  grupoExplosiones.Add(explosion)
+
+End
+
+'-----------------------------------------------------
+' Analisis de colisiones...
+'-----------------------------------------------------
+'
+Public Sub analizaColisiones()
+  'colicion avion contra enemigo
+
+  Dim b As Integer
+  Dim a As Integer
+  Dim heroe As AvionControlado
+
+  heroe = grupoAviones[0] 'avion controlado por usuario
+
+  If heroe.isActive() Then
+    '----------------------------
+    'colision heroe-enemigo
+    '----------------------------
+    For a = 1 To grupoAviones.count - 1
+      If grupoAviones[a].isActive() And If heroe.collide(grupoAviones[a]) Then
+        CrearExplosion(heroe.getx(), heroe.gety())
+        CrearExplosion(grupoAviones[a].getx(), grupoAviones[a].gety())
+        grupoAviones[a].off()
+        ProgressBarDanos.value += 0.30 'se entralla entre dos aviones 1/3 de daños
+        If ProgressBarDanos.value > 0.991 Then
+          heroe.off()
+          findeljuego = True  ' Print "ha habido colision"
+          TimerParada.Delay = 1000
+          TimerParada.Start()
+        Endif
+      Endif
+
+    Next
+    '----------------------------
+    'colision hero-disparo
+    '----------------------------
+    For a = 0 To grupoDisparosEnemigos.count - 1
+      If grupoDisparosEnemigos[a].isActive() And If heroe.collide(grupoDisparosEnemigos[a]) Then
+        CrearExplosion(heroe.getx(), heroe.gety())
+        grupoDisparosEnemigos[a].off()
+
+        ProgressBarDanos.value += 0.10
+        If ProgressBarDanos.value > 0.991 Then
+
+          heroe.off()
+
+          findeljuego = True  ' Print "ha habido colision"
+          TimerParada.Delay = 1000
+          TimerParada.Start()
+        Endif
+      Endif
+    Next
+
+    'colision enemigo - disparo
+    For a = 0 To grupoDisparosPropios.count - 1
+      For b = 1 To grupoAviones.count - 1
+        If grupoAviones[b].isActive() And grupoDisparosPropios[a].isactive() Then
+          If grupoDisparosPropios[a].collide(grupoAviones[b]) Then
+            grupoAviones[b].off()
+            grupoDisparosPropios[a].off()
+
+            CrearExplosion(grupoAviones[b].getx(), grupoAviones[b].gety())
+            valueboxPuntuacion.value += 10
+            Break
+          Endif
+
+        Endif
+      Next
+
+    Next
+
+  Endif
+
+End
+
+'
+
+Public Sub TimerParada_Timer()
+
+  TimerRedibujar.Stop()
+  TimerParada.Enabled = False
+  Message.Info("fin del juego")
+
+End
+
+Public Sub ButtonIniciar_Click()
+  'crear aviones
+
+  grupoAviones = New Sprite[]
+  grupoDisparosPropios = New Sprite[]
+  grupoDisparosEnemigos = New Sprite[]
+  grupoExplosiones = New Sprite[]
+
+  crearAviones()
+  'fondo de pantalla Mapa
+  fondo = New CapaFondo(DrawingArea1, "fondo/mapa1.txt")
+
+  TimerRedibujar.Trigger()
+  TimerRedibujar.Delay = 10
+  TimerRedibujar.Start()
+  DrawingArea1.SetFocus()
+  ProgressBarDanos.value = 0
+
+End

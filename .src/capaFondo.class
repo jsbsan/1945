@@ -1,0 +1,129 @@
+' Gambas class file
+
+'mapa y fondo
+Private map As Integer[]
+Private indice As Single
+Private indice_in As Single
+
+Private xtiles As Integer
+Private ytiles As Integer
+
+Private tile As New Sprite[5]
+
+Public Sub _new(zonaDibujo As DrawingArea, ruta As String)
+
+  DefinirMapa(ruta)
+  calculoColumnasyFilas(zonaDibujo)
+
+End
+
+'-------------------
+'mapa juego
+'------------------
+'
+Public Sub DefinirMapa(ruta As String)
+
+  Dim i As Integer
+
+  map = cargamapa(ruta)
+
+  For i = 1 To 4
+    tile[i] = New Sprite(1)
+    tile[i].on()
+  Next
+
+  tile[1].addFrame(1, "fondo/0.png")
+  tile[2].addFrame(1, "fondo/1.png")
+  tile[3].addFrame(1, "fondo/2.png")
+  tile[4].addFrame(1, "fondo/3.png")
+
+End
+
+'-------------- dibujar mapa con scroll -----------------
+Public Sub dibuja()
+
+  doScroll()
+  dibujaFondo()
+
+End
+
+Private Sub doScroll()
+
+  indice_in += 1
+
+  If indice_in >= 60 Then
+    indice_in = 0
+    indice -= xtiles
+  Endif
+
+  If (indice <= 0) Then
+    'llegamos al final del mapa, empezamos de uevo
+    indice = map.Length - (xtiles * ytiles)
+    indice_in = 0
+  Endif
+
+End
+
+Public Sub dibujaFondo()
+
+  Dim i As Integer
+  Dim j As Integer
+  Dim x As Integer
+  Dim y As Integer
+  Dim t As Integer
+
+  For i = 0 To ytiles - 1
+    For j = 0 To xtiles - 1
+
+      t = map[indice + (i * xtiles + j)]
+      x = j * 60
+      y = (i - 1) * 60 + indice_in
+
+      't = map[i * xtiles + j]
+      'x = j * 60
+      'y = (i - 1) * 60
+
+      tile[t + 1].setX(x)
+      tile[t + 1].sety(y)
+      tile[t + 1].dibuja()
+
+    Next
+  Next
+
+End
+
+'------------------- gestion mapa ---------------------------
+
+Public Sub cargamapa(ruta As String) As Integer[]
+
+  Dim contenido As String
+  Dim a As Integer
+  Dim devolver As New Integer[]
+  Dim celdasT As String[]
+  'leeo archivo
+  '
+  contenido = File.Load("fondo/mapa1.txt")
+  'quito espacios:
+  contenido = Replace(contenido, " ", "")
+  'quito \n
+  contenido = Replace(contenido, "\n", "")
+  celdast = Split(contenido, ",")
+
+  For a = 0 To celdast.max
+
+    devolver.Add(Val(celdasT[a]))
+  Next
+
+  Return devolver
+
+End
+
+Public Sub calculoColumnasyFilas(d As DrawingArea)
+
+  '  Print "ancho:", Int(d.w / 60) + 1
+  '  Print "alto:", Int(d.h / 60) * 1
+
+  xtiles = Int(d.w / 60) + 1 'las que caben en pantalla columnas
+  ytiles = Int(d.h / 60) + 1 'las que caben en pantall filas
+
+End

@@ -1,0 +1,16 @@
+' Gambas class file
+
+Inherits Sprite
+
+Public Sub mover()
+
+  If (Super.getx() + Super.deltaX) > 0 And (Super.getx() + Super.getw() + Super.deltaX) < Super.hancho Then
+    Super.setX(Super.getx() + Super.deltaX)
+    If (Super.gety() + Super.deltay) > 40 And (Super.gety() + Super.getH() + Super.deltay) < (Super.halto - 40) Then
+
+      Super.sety(Super.gety() + Super.deltay)
+      Super.silueta = Rect(Super.getx(), Super.gety(), Super.getW(), Super.getH())
+    Endif
+  Endif
+
+End

@@ -1,0 +1,45 @@
+' Gambas class file
+
+Inherits Sprite
+
+Private howner As Boolean
+
+Public Sub setOwner(owner As Boolean)
+
+  howner = owner
+
+End
+
+Public Function getOwner() As Boolean
+
+  Return howner
+
+End
+
+Public Sub domovement()
+
+  If howner = True Then
+    Super.incrementoY(-3) 'disparo avion jugador
+  Else
+    Super.incrementoY(+3) 'disparo aviones enemigos
+  Endif
+
+End
+
+Public Sub mover()
+
+  domovement()
+
+  'si enemigo sale de la pantalla, se anula...
+  '  If (Super.getx() + Super.deltaX) > 0 And (Super.getx() + Super.getw() + Super.deltaX) < Super.hancho Then
+  If Super.gety() < 0 Or Super.gety() > Super.halto Then
+    Super.off()
+    Return
+  Endif
+
+  'mover disparo
+  Super.setX(Super.getx() + Super.deltaX)
+  Super.sety(Super.gety() + Super.deltay)
+  Super.silueta = Rect(Super.getx(), Super.gety(), Super.getW(), Super.getH())
+
+End

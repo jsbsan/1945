@@ -1,0 +1,36 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2002-11-01 04:27+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: .project:1
+msgid "1945"
+msgstr "1945"
+
+#: .project:2
+msgid "Vuela y destruye a los aviones enemigos!!!"
+msgstr "Fly e distruggere aerei nemici !!!"
+
+#: FMain.form:29
+msgid "Iniciar"
+msgstr "Inizio "
+
+#: FMain.form:36
+msgid "ValueBox1"
+msgstr ""
+
+#: FMain.form:42
+msgid "Puntuación"
+msgstr "valutazione "
+
+#: FMain.form:48
+msgid "Nivel de daños"
+msgstr "Livello di danno "
+

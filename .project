@@ -1,0 +1,24 @@
+# Gambas Project File 3.0
+Title=1945
+Startup=FMain
+Icon=aviones/avion1.png
+Version=0.0.7
+Component=gb.image
+Component=gb.gui.qt
+Component=gb.form
+Description="Vuela y destruye a los aviones enemigos!!!"
+Authors="Julio Sánchez Berro"
+TabSize=2
+Translate=1
+Language=es
+Maintainer=Julio Sanchez Berro
+Address=jusabejusabe@gmail.com
+Url=http://www.jsbsan.blogspot.com
+License=General Public License
+PackageName=1945-0.0.7
+CreateEachDirectory=1
+Packager=1
+Systems=debian
+Menus=debian:"Games/Simulation"
+Categories=debian:"Game;Simulation"
+Groups=debian:"admin"

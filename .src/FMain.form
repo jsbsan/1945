@@ -1,0 +1,56 @@
+# Gambas Form File 3.0
+
+{ Form Form
+  MoveScaled(0,0,67,64)
+  Background = &H959F8B&
+  Icon = Picture["aviones/avion1.png"]
+  Resizable = False
+  { DrawingArea1 DrawingArea
+    MoveScaled(0,0,67,52)
+    Background = &H3761DF&
+    { TimerRedibujar #Timer
+      #MoveScaled(28,1)
+    }
+    { TimerParada #Timer
+      #MoveScaled(41,1)
+    }
+    { joy1 JoyStick
+      MoveScaled(29,13,15,7)
+    }
+  }
+  { ButtonIniciar Button
+    MoveScaled(1,53,16,7)
+    AutoResize = True
+    Text = ("Iniciar")
+    Picture = Picture["aviones/avion1.png"]
+  }
+  { valueboxPuntuacion ValueBox
+    MoveScaled(18,56,14,4)
+    Background = Color.LightForeground
+    Text = ("ValueBox1")
+    ReadOnly = True
+  }
+  { Label1 Label
+    MoveScaled(18,52,14,4)
+    Alignment = Align.Center
+    Text = ("Puntuación")
+  }
+  { Label2 Label
+    MoveScaled(34,52,23,4)
+    Alignment = Align.Center
+    Text = ("Nivel de daños")
+  }
+  { ProgressBarDanos ProgressBar
+    MoveScaled(34,56,24,3)
+  }
+  { Label3 Label
+    MoveScaled(1,61,65,3)
+    Foreground = &H0000FF&
+    Text = ("Autor: Julio Sánchez Berro. Licencia: GPL 2.0 www.jsbsan.blogspot.com")
+  }
+  { PictureBox1 PictureBox
+    MoveScaled(59,52,7,9)
+    Picture = Picture.Load("gambas update version actualizacion .png")
+    Stretch = True
+  }
+}

@@ -1,0 +1,102 @@
+' Gambas class file
+
+Inherits Sprite
+
+Public Sub mover()
+
+  domovement()
+
+  'si enemigo sale de la pantalla, se anula...
+  '  If (Super.getx() + Super.deltaX) > 0 And (Super.getx() + Super.getw() + Super.deltaX) < Super.hancho Then
+  If Super.gety() < 0 Or Super.gety() > Super.halto Then
+
+    Super.off()
+    Return
+  Endif
+
+  'mover avion
+  Super.setX(Super.getx() + Super.deltaX)
+  Super.sety(Super.gety() + Super.deltay)
+  Super.silueta = Rect(Super.getx(), Super.gety(), Super.getW(), Super.getH())
+
+End
+
+Public Sub domovement()
+
+  ' Print Me.tipo,
+  Select Case Me.tipo
+    Case 2
+      ' Avion que dispara cuando llega a cierta altura
+      If Super.gety() > 120 And Me.estado <> 2 Then
+        Me.estado = 2
+        'dispara
+        If Me.isactive() Then FMain.disparar(Me, False)
+        Super.incrementoy(-2)
+        If Int(Rnd(1, 11)) > 5 Then
+          Super.incrementox(-1)
+        Else
+          Super.incrementox(+1)
+        Endif
+      Endif
+
+    Case 1, 0
+      If Super.gety() > 40 And Me.estado < 2 Then
+        Me.estado += 1
+        'dispara
+        If Me.isactive() Then FMain.disparar(Me, False)
+
+        If Int(Rnd(1, 15)) > 5 Then
+          Super.incrementox(-1)
+        Else
+          Super.incrementox(+1)
+        Endif
+      Endif
+
+  End Select
+
+End
+
+Property Estado As Integer
+Private hestado As Integer
+
+Private Function Estado_Read() As Integer
+
+  Return hestado
+
+End
+
+Private Sub Estado_Write(Value As Integer)
+
+  hestado = value
+
+End
+
+Property tipo As Integer
+Private htipo As Integer
+
+Private Function tipo_Read() As Integer
+
+  Return htipo
+
+End
+
+Private Sub tipo_Write(Value As Integer)
+
+  htipo = value
+
+End
+
+'---------------------
+'sobre escribo el método dibujo, según la direccion del avion
+Public Sub dibuja()
+
+  If Me.isActive() Then
+    If Super.deltay > 0 Then
+      Paint.DrawImage(Super.i_sprites[1], Super.getx(), Super.gety())
+    Else
+      Paint.DrawImage(Super.i_sprites[2], Super.getx(), Super.gety())
+    Endif
+    Paint.Fill
+  Endif
+
+End

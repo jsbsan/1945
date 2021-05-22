@@ -1,0 +1,290 @@
+' Gambas class file
+
+' libro PROGRAMACION DE JUEGOS PARA MÓVILES CON J2MECC
+'
+' la coordenada en pantalla del sprite (que almacenamos en posx y posy
+Private posx As Integer
+Private posy As Integer
+Public active As Boolean 'nos servirá para saber si el sprite está activo.
+
+Private hframe As Integer 'almacena el frame actual del sprite
+
+Private nframes As Integer 'el número total de frames de los que está compuesto.
+
+Public i_sprites As Image[] 'tenemos un array de objetos Image que contendrá cada uno de los frames del juego.
+
+Private hrect As Rect 'silueta del frame
+
+'para el movimimento en pantalla
+Public deltax As Integer
+Public deltay As Integer
+Public hancho As Integer
+Public halto As Integer
+
+Public Silueta As New Rect 'lista de rectangulos que forma la silueta del dibujo
+
+Public Sub _new(numero_frames As Integer)
+
+  active = False
+  hframe = 1 'frame actual
+  nframes = numero_frames 'numero de frames totales
+
+  i_sprites = New Image[nframes + 1]
+
+End
+
+'movimiento por la pantalla.
+
+Public Sub setX(x As Integer)
+
+  posx = x
+
+End
+
+Public Sub sety(y As Integer)
+
+  posy = y
+
+End
+
+Public Function getx() As Integer
+
+  Return posx
+
+End
+
+Public Function gety() As Integer
+
+  Return posy
+
+End
+
+'tamaño del sprites
+Public Function getW() As Integer
+
+  Return i_sprites[1].W 'cambiado al primer frame
+
+End
+
+Public Function getH() As Integer
+
+  Return i_sprites[1].h 'cambiado al primer frame
+
+End
+
+'-------------------------
+'estado del sprite
+'-------------------------
+Public Sub on()
+
+  active = True
+
+End
+
+Public Sub off()
+
+  active = False
+
+End
+
+Public Function isActive() As Boolean
+
+  Return active
+
+End
+
+'----------------------------
+' para el control de frames
+'----------------------------
+'
+
+Public Sub setFrame(frameno As Integer)
+
+  hframe = frameno
+
+End
+
+Public Function getFrameActual() As Integer
+
+  Return hframe
+
+End
+
+Public Function frames() As Integer
+
+  Return nframes
+
+End
+
+Public Sub addFrame(frameno As Integer, path As String)
+
+  If File.Ext(path) = "" Then path &= ".png"
+  Try i_sprites[Frameno] = Image.Load(path)
+  If Error Then
+    Print "Error: no puedo leer la imagen " & path
+    Print Error.text
+  Endif
+
+End
+
+Public Sub addMultipleFrame(path As String, filas As Integer, columnas As Integer)
+  'para extraer frames de ficheros con multiple dibujos...
+
+  Dim i As Image
+  Dim fila As Integer
+  Dim columna As Integer
+  Dim imagenAncho As Integer
+  Dim imagenLargo As Integer
+  Dim fichero As Picture
+  Dim hBrush As PaintBrush
+  Dim contador As Integer
+
+  i = Image.Load(path)
+
+  imagenAncho = i.w / columnas
+  imagenlargo = i.h / filas
+
+  i_sprites = Null
+  i_sprites = New Image[filas * columnas + 1]
+
+  For fila = 1 To filas
+    For columna = 0 To columnas
+
+      fichero = New Picture(imagenAncho, imagenLargo, Color.Transparent)
+      Paint.Begin(fichero)
+
+      Paint.DrawImage(i, 0, 0, imagenAncho, imagenLargo, 1, Rect((columna - 1) * imagenAncho, (fila - 1) * imagenLargo, imagenancho, imagenlargo))
+      Paint.Stroke()
+      Paint.Fill
+
+      Paint.End()
+      fichero.Save("/tmp/dibujo" & Str$(contador) & ".png")
+
+      contador += 1
+
+    Next
+  Next
+
+  setFrame(contador - 1)
+
+  For fila = 1 To contador - 1
+    addFrame(fila, "/tmp/dibujo" & Str$(fila) & ".png")
+  Next
+
+End
+
+Public Sub dibuja()
+
+  If Me.isActive() Then
+    Paint.DrawImage(i_sprites[hframe], getx(), gety())
+
+    Paint.Fill
+  Endif
+
+End
+
+Public Function collide(sp As Sprite) As Boolean
+
+  'Dim ra As Rect
+  'Dim rb As Rect
+  'Dim colicion As Boolean = False
+
+  Dim w1, h1, w2, h2, x1, y1, x2, y2 As Integer
+
+  w1 = getW()
+  h1 = getH()
+  w2 = sp.getW()
+  h2 = sp.getH()
+  x1 = getX()
+  y1 = getY()
+  x2 = sp.getX()
+  y2 = sp.getY()
+
+  If (((x1 + w1) > x2) And ((y1 + h1) > y2) And ((x2 + w2) > x1) And ((y2 + h2) > y1)) Then
+    Return True
+  Else
+    Return False
+  Endif
+
+  '  ra = Me.Silueta
+  '  If Not IsNull(ra.Intersection(sp.Silueta)) Then
+  '    Return True 'si tropiezan
+  '  Endif
+
+  ' Return False 'no hay colision
+
+End
+
+Public Function siluetainicial() As Rect
+
+  Dim rtmp As Rect
+
+  rtmp = New Rect(getx(), gety(), getW(), getH())
+
+  Return rtmp
+
+End
+
+Public Sub siluetaBasica()
+  'la silueta basica es la del frame
+
+  silueta.Clear()
+  silueta.Add(siluetainicial())
+
+End
+
+'--------------------------------------------------
+'movimiento
+'--------------------------------------------------
+Public Sub incrementoX(dx As Integer)
+
+  deltax = dx
+
+End
+
+Public Sub incrementoY(dy As Integer)
+
+  deltay = dy
+
+End
+
+Public Sub ZonaDibujoAncho(ancho As Integer)
+
+  hancho = ancho
+
+End
+
+Public Sub ZonaDibujoAlto(alto As Integer)
+
+  halto = alto
+
+End
+'-----------------------------------------
+'metodos vacios para el polimorfismo.
+'-----------------------------------------
+
+Public Sub mover()
+
+  'usado para el polimorfismo
+
+End
+
+Property tipo As Integer '
+
+Private Function tipo_Read() As Integer
+
+End
+
+Private Sub tipo_Write(Value As Integer)
+
+End
+
+Property Estado As Integer
+
+Private Function Estado_Read() As Integer
+
+End
+
+Private Sub Estado_Write(Value As Integer)
+
+End
