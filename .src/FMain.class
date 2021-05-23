@@ -10,6 +10,9 @@ Public grupoExplosiones As New Sprite[]
 Public findeljuego As Boolean
 Public fondo As CapaFondo
 
+Public TotalDisparosMios As Integer = 20 'antes era 6
+Public ControlDeApareceElEnemigo As Integer = 75 'cuanto mas pequeño aparecen mas enemigos a la vez
+Public NumeroMaximoDeAvionesAlaVez As Integer = 20 'buffer de aviones existentes en memoria
 ' by Terco
 ' Public joy1 As New JoyStick(Me)
 Public JoyStickReady As Boolean = True
@@ -64,7 +67,7 @@ Public Sub TimerRedibujar_Timer()
   Dim disparotmp As Sprite
   Dim explosion As Explode
 
-  If ciclo > 200 Then
+  If ciclo > ControlDeApareceElEnemigo Then
     creaenemigo()
     ciclo = 0
   Else
@@ -199,16 +202,16 @@ Public Sub crearAviones()
   '-------------------------------
   avionTmp = Null
   avionTmp = New AvionEnemigo(2)
-  avionTmp.addFrame(1, "aviones/avionEnemigo1.png")
-  avionTmp.addFrame(2, "aviones/avionEnemigo1b.png")
-  avionTmp.setX(DrawingArea1.w - 80) 'pongo el avion en la mitad de la pantalla
+  avionTmp.addFrame(1, "aviones/avionEnemigo3.png")
+  avionTmp.addFrame(2, "aviones/avionEnemigo3b.png")
+  avionTmp.setX(DrawingArea1.w / 180) 'pongo el avion en la mitad de la pantalla
   avionTmp.sety(0) 'pongo el avion en la mitad de la pantalla
 
   avionTmp.ZonaDibujoAlto(DrawingArea1.h)
   avionTmp.ZonaDibujoAncho(DrawingArea1.w)
-  avionTmp.tipo = 2
+  avionTmp.tipo = 3
   'movimiento inicial del avion
-  avionTmp.incrementoY(+1)
+  ' avionTmp.incrementoY(+1)
   aviontmp.on()
   grupoAviones.add(avionTmp)
 
@@ -225,7 +228,7 @@ Public Sub creaenemigo()
   Dim freeEnemigo As Integer = 0
 
   'si no he superado un total de 7 aviones
-  If grupoAviones.count < 5 Then
+  If grupoAviones.count < NumeroMaximoDeAvionesAlaVez Then
     avionTmp = Null
     avionTmp = New AvionEnemigo(2)
     modelo = eligemodelo()
@@ -233,14 +236,26 @@ Public Sub creaenemigo()
     avionTmp.addFrame(2, modelo & "b.png")
 
     avionTmp.setX(Rnd(0, DrawingArea1.w - 80)) 'pongo el avion en la mitad de la pantalla
-    avionTmp.sety(0) 'pongo el avion en la mitad de la pantalla
+    avionTmp.sety(0) 'pongo el avion el inicio  de la pantalla
     avionTmp.estado = 0
-    avionTmp.tipo = Int(Rnd(1, 10) / 5) + 1 'eligo aleatoriamente tipo 1 o 2
-    avionTmp.incrementox(0)
+
+    avionTmp.tipo = Int(Rnd(1, 2))  'eligo aleatoriamente tipo 1, 2 o 3
+    Print modelo
+
+    If modelo = "aviones/avionEnemigo3" Then
+      aviontmp.tipo = 3
+      avionTmp.setX(19)
+      avionTmp.incrementox(+1)
+    Else
+      avionTmp.incrementoY(+1)
+      avionTmp.incrementox(0)
+      avionTmp.tipo = Int(Rnd(1, 2))  'eligo aleatoriamente tipo 1, 2
+    Endif
+
     avionTmp.ZonaDibujoAlto(DrawingArea1.h)
     avionTmp.ZonaDibujoAncho(DrawingArea1.w)
     'movimiento inicial del avion
-    avionTmp.incrementoY(+1)
+
     aviontmp.on()
     grupoAviones.add(avionTmp)
     Return
@@ -257,7 +272,7 @@ Public Sub creaenemigo()
 
   If freeEnemigo <> 0 Then
     grupoAviones[freeEnemigo].on()
-    grupoAviones[freeEnemigo].tipo = Int(Rnd(1, 10) / 5) + 1 'eligo aleatoriamente tipo 1 o 2
+    grupoAviones[freeEnemigo].tipo = Int(Rnd(1, 3)) 'eligo aleatoriamente tipo 1 , 2 o 3
     grupoAviones[freeEnemigo].estado = 0
     modelo = eligemodelo()
     grupoAviones[freeEnemigo].addFrame(1, modelo & ".png")
@@ -266,11 +281,14 @@ Public Sub creaenemigo()
     grupoAviones[freeEnemigo].sety(0) 'pongo el avion en la mitad de la pantalla
     grupoAviones[freeEnemigo].incrementox(0)
     'movimiento inicial del avion
-    If grupoAviones[freeEnemigo].tipo = 1 Then
-      grupoAviones[freeEnemigo].incrementoY(+2)
-    Else
-      grupoAviones[freeEnemigo].incrementoY(+1)
-    Endif
+    Select Case grupoAviones[freeEnemigo].tipo
+      Case 1
+        grupoAviones[freeEnemigo].incrementoY(+2)
+      Case 2
+        grupoAviones[freeEnemigo].incrementoY(+1)
+      Case 3
+        grupoAviones[freeEnemigo].incrementoY(+1)
+    End Select
 
   Endif
 
@@ -280,16 +298,16 @@ Public Sub eligemodelo() As String
 
   Dim valor As Integer = Int(Rnd(1, 100))
 
-  If valor < 33 Then
-    Return "aviones/avionEnemigo1"
-  Else
-    If valor < 66 Then
-
+  Select Case valor
+    Case 0 To 33
+      Return "aviones/avionEnemigo1"
+    Case 34 To 66
       Return "aviones/avionEnemigo2"
-    Else
+    Case 67 To 90
       Return "aviones/avionEnemigo4"
-    Endif
-  Endif
+    Case 91 To 100
+      Return "aviones/avionEnemigo3"
+  End Select
 
 End
 
@@ -311,7 +329,7 @@ Public Sub HacerdisparoPropio(avion As Sprite)
   Dim freedisparo1 As Integer = -1
   Dim freedisparo2 As Integer = -1
 
-  If grupoDisparosPropios.count < 6 Then
+  If grupoDisparosPropios.count < TotalDisparosMios Then
     disparoTmp = Null
     disparoTmp = New Bullet(1)
     disparoTmp.addFrame(1, "disparo1.png")
@@ -391,7 +409,13 @@ Public Sub HacerDisparoEnemigo(avion As Sprite)
   If grupoDisparosEnemigos.count < 30 Then
     disparoTmp = Null
     disparoTmp = New Bullet(1)
-    disparoTmp.addFrame(1, "disparoEnemigo.png")
+
+    If Int(Rnd(1, 4) / 2) = 0 Then
+      disparoTmp.addFrame(1, "disparoEnemigo.png")
+    Else
+      disparoTmp.addFrame(1, "bomba.png")
+    Endif
+
     disparoTmp.setX(avion.getx())
     disparoTmp.sety(avion.gety())
     disparoTmp.ZonaDibujoAlto(DrawingArea1.h)

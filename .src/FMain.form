@@ -1,12 +1,12 @@
 # Gambas Form File 3.0
 
 { Form Form
-  MoveScaled(0,0,67,64)
+  MoveScaled(0,0,122,88)
   Background = &H959F8B&
   Icon = Picture["aviones/avion1.png"]
   Resizable = False
   { DrawingArea1 DrawingArea
-    MoveScaled(0,0,67,52)
+    MoveScaled(1,1,120,77.1429)
     Background = &H3761DF&
     { TimerRedibujar #Timer
       #MoveScaled(28,1)
@@ -19,38 +19,38 @@
     }
   }
   { ButtonIniciar Button
-    MoveScaled(1,53,16,7)
+    MoveScaled(1,79,16,7)
     AutoResize = True
     Text = ("Iniciar")
     Picture = Picture["aviones/avion1.png"]
   }
   { valueboxPuntuacion ValueBox
-    MoveScaled(18,56,14,4)
+    MoveScaled(18,82,14,4)
     Background = Color.LightForeground
     Text = ("ValueBox1")
     ReadOnly = True
   }
   { Label1 Label
-    MoveScaled(18,52,14,4)
+    MoveScaled(18,78,14,4)
     Alignment = Align.Center
     Text = ("Puntuación")
   }
   { Label2 Label
-    MoveScaled(34,52,23,4)
+    MoveScaled(34,78,23,4)
     Alignment = Align.Center
     Text = ("Nivel de daños")
   }
   { ProgressBarDanos ProgressBar
-    MoveScaled(34,56,24,3)
+    MoveScaled(34,82,24,3)
   }
   { Label3 Label
-    MoveScaled(1,61,65,3)
+    MoveScaled(1,87,65,3)
     Foreground = &H0000FF&
     Text = ("Autor: Julio Sánchez Berro. Licencia: GPL 2.0 www.jsbsan.blogspot.com")
   }
   { PictureBox1 PictureBox
-    MoveScaled(59,52,7,9)
-    Picture = Picture.Load("gambas update version actualizacion .png")
+    MoveScaled(59,78,7,9)
+    Picture = Picture["gambas update version actualizacion .png"]
     Stretch = True
   }
 }

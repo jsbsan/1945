@@ -39,7 +39,7 @@ Public Sub domovement()
         Endif
       Endif
 
-    Case 1, 0
+    Case 0 To 1
       If Super.gety() > 40 And Me.estado < 2 Then
         Me.estado += 1
         'dispara
@@ -51,6 +51,11 @@ Public Sub domovement()
           Super.incrementox(+1)
         Endif
       Endif
+      'añado nuevo tipo de enemigo
+    Case 3
+      If Super.getx() < 20 Then Super.incrementoX(+1)
+      If Super.getx() + 30 > Super.hancho Then Super.incrementoX(-1)
+      Super.deltay = 0
 
   End Select
 

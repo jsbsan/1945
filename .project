@@ -2,7 +2,7 @@
 Title=1945
 Startup=FMain
 Icon=aviones/avion1.png
-Version=0.0.7
+Version=0.0.8
 Component=gb.image
 Component=gb.gui.qt
 Component=gb.form

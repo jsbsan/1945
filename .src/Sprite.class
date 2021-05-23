@@ -21,6 +21,8 @@ Public deltay As Integer
 Public hancho As Integer
 Public halto As Integer
 
+Public hpath As String
+
 Public Silueta As New Rect 'lista de rectangulos que forma la silueta del dibujo
 
 Public Sub _new(numero_frames As Integer)
@@ -124,6 +126,8 @@ Public Sub addFrame(frameno As Integer, path As String)
     Print "Error: no puedo leer la imagen " & path
     Print Error.text
   Endif
+
+  hpath = path
 
 End
 

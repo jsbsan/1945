@@ -21,7 +21,12 @@ Public Sub domovement()
   If howner = True Then
     Super.incrementoY(-3) 'disparo avion jugador
   Else
-    Super.incrementoY(+3) 'disparo aviones enemigos
+    If Super.hpath <> "bomba.png" Then
+
+      Super.incrementoY(+2) 'disparo aviones enemigos
+    Else
+      Super.incrementoY(+1) 'bomba aviones enemigos se desplaza más lentamente
+    Endif
   Endif
 
 End
