@@ -4,6 +4,11 @@ Inherits Sprite
 
 Private howner As Boolean
 
+Public VelocidadDisparoJuagador As Integer = -5 'disparo de jugador y va hacia arriba
+
+Public VelocidadDisparoEnemigo As Integer = +4 'disparo de enemigo  y va hacia abajo
+Public VelocidadBombaEnemigo As Integer = +2 'bomba de enemigo  y va hacia abajo
+
 Public Sub setOwner(owner As Boolean)
 
   howner = owner
@@ -19,13 +24,13 @@ End
 Public Sub domovement()
 
   If howner = True Then
-    Super.incrementoY(-3) 'disparo avion jugador
+    Super.incrementoY(VelocidadDisparoJuagador) 'disparo avion jugador
   Else
     If Super.hpath <> "bomba.png" Then
 
-      Super.incrementoY(+2) 'disparo aviones enemigos
+      Super.incrementoY(VelocidadDisparoEnemigo) 'disparo aviones enemigos
     Else
-      Super.incrementoY(+1) 'bomba aviones enemigos se desplaza más lentamente
+      Super.incrementoY(VelocidadBombaEnemigo) 'bomba aviones enemigos se desplaza más lentamente
     Endif
   Endif
 
