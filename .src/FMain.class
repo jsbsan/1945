@@ -343,23 +343,26 @@ Public Sub HacerdisparoPropio(avion As Sprite)
     disparoTmp.on()
     grupoDisparosPropios.Add(disparoTmp)
 
-    '---------------------------
-    'doble disparo...
-    '---------------------------
-    disparoTmp = Null
+    'si la puntuacion es mayor de 50
+    If valueboxPuntuacion.value > 50 Then
+      '---------------------------
+      'doble disparo...
+      '---------------------------
+      disparoTmp = Null
 
-    disparoTmp = New Bullet(1)
-    disparoTmp.addFrame(1, "disparo1.png")
-    disparoTmp.setX(avion.getx() + avion.getW() - 20)
-    disparoTmp.sety(avion.gety())
-    disparoTmp.ZonaDibujoAlto(DrawingArea1.h)
-    disparoTmp.ZonaDibujoAncho(DrawingArea1.w)
+      disparoTmp = New Bullet(1)
+      disparoTmp.addFrame(1, "disparo1.png")
+      disparoTmp.setX(avion.getx() + avion.getW() - 20)
+      disparoTmp.sety(avion.gety())
+      disparoTmp.ZonaDibujoAlto(DrawingArea1.h)
+      disparoTmp.ZonaDibujoAncho(DrawingArea1.w)
 
-    disparoTmp.setOwner(True)
-    disparoTmp.on()
+      disparoTmp.setOwner(True)
+      disparoTmp.on()
 
-    grupoDisparosPropios.Add(disparoTmp)
-    Return
+      grupoDisparosPropios.Add(disparoTmp)
+      Return
+    Endif
   Endif
   'sino busco elementos de array que esten libres:
   For a = 0 To grupoDisparosPropios.count - 1
@@ -386,15 +389,18 @@ Public Sub HacerdisparoPropio(avion As Sprite)
     disparoTmp.on()
   Endif
 
-  If freedisparo2 > -1 Then
-    disparotmp = grupoDisparosPropios[freedisparo2]
-    disparoTmp.addFrame(1, "disparo1.png")
-    disparoTmp.setX(avion.getx() + avion.getW() - 20)
-    disparoTmp.sety(avion.gety())
-    'disparoTmp.ZonaDibujoAlto(DrawingArea1.h)
-    ' disparoTmp.ZonaDibujoAncho(DrawingArea1.w)
-    disparoTmp.setOwner(True)
-    disparoTmp.on()
+  'si la puntuacion es mayor de 50
+  If valueboxPuntuacion.value > 50 Then
+    If freedisparo2 > -1 Then
+      disparotmp = grupoDisparosPropios[freedisparo2]
+      disparoTmp.addFrame(1, "disparo1.png")
+      disparoTmp.setX(avion.getx() + avion.getW() - 20)
+      disparoTmp.sety(avion.gety())
+      'disparoTmp.ZonaDibujoAlto(DrawingArea1.h)
+      ' disparoTmp.ZonaDibujoAncho(DrawingArea1.w)
+      disparoTmp.setOwner(True)
+      disparoTmp.on()
+    Endif
   Endif
 
 End
