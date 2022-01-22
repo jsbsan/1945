@@ -572,3 +572,10 @@ Public Sub ButtonIniciar_Click()
   ProgressBarDanos.value = 0
 
 End
+
+Public Sub Form_Close()
+  ''contribution made PartierSP
+
+  joy1.Close
+
+End
