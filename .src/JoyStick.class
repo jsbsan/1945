@@ -71,106 +71,108 @@ Public Sub Device_Read()
 
   Dim CalibrationZero As Integer = 200
 
-  stamp = Read #jsdev As Integer ', 4  ' stamp: 4 bytes
-  value = Read #jsdev As Short ' , 2 ' value: 2 bytes
-  myevent = Read #jsdev As Byte ' , 1 ' myevent: 1 byte
-  number = Read #jsdev As Byte ', 1 ' number: 1 byte
+  While Not Eof(jsdev)
+    stamp = Read #jsdev As Integer ', 4  ' stamp: 4 bytes
+    value = Read #jsdev As Short ' , 2 ' value: 2 bytes
+    myevent = Read #jsdev As Byte ' , 1 ' myevent: 1 byte
+    number = Read #jsdev As Byte ', 1 ' number: 1 byte
 
-  ' Debug "MyEvent", myevent
-  ' Debug "Number", number
-  ' Debug "Value", value
+    Debug "MyEvent", myevent
+    Debug "Number", number
+    Debug "Value", value
 
-  If myevent And 1 Then 'Si es un boton
-    If value Then 'Si se presiona un boton
-      Select Case number
-        Case 0
-          boton0 = True
-        Case 1
-          boton1 = True
-        Case 2
-          boton2 = True
-        Case 3
-          boton3 = True
-        Case 4
-          boton4 = True
-        Case 5
-          boton5 = True
-        Case 6
-          boton6 = True
-        Case 7
-          boton7 = True
-        Case 8
-          boton8 = True
-        Case 9
-          boton9 = True
-        Case 10
-          boton10 = True
-        Case 11
-          boton11 = True
-      End Select
-    Else 'Si se suelta un boton
-      Select Case number
-        Case 0
-          boton0 = False
-        Case 1
-          boton1 = False
-        Case 2
-          boton2 = False
-        Case 3
-          boton3 = False
-        Case 4
-          boton4 = False
-        Case 5
-          boton5 = False
-        Case 6
-          boton6 = False
-        Case 7
-          boton7 = False
-        Case 8
-          boton8 = False
-        Case 9
-          boton9 = False
-        Case 10
-          boton10 = False
-        Case 11
-          boton11 = False
-      End Select
+    If myevent And 1 Then 'Si es un boton
+      If value Then 'Si se presiona un boton
+        Select Case number
+          Case 0
+            boton0 = True
+          Case 1
+            boton1 = True
+          Case 2
+            boton2 = True
+          Case 3
+            boton3 = True
+          Case 4
+            boton4 = True
+          Case 5
+            boton5 = True
+          Case 6
+            boton6 = True
+          Case 7
+            boton7 = True
+          Case 8
+            boton8 = True
+          Case 9
+            boton9 = True
+          Case 10
+            boton10 = True
+          Case 11
+            boton11 = True
+        End Select
+      Else 'Si se suelta un boton
+        Select Case number
+          Case 0
+            boton0 = False
+          Case 1
+            boton1 = False
+          Case 2
+            boton2 = False
+          Case 3
+            boton3 = False
+          Case 4
+            boton4 = False
+          Case 5
+            boton5 = False
+          Case 6
+            boton6 = False
+          Case 7
+            boton7 = False
+          Case 8
+            boton8 = False
+          Case 9
+            boton9 = False
+          Case 10
+            boton10 = False
+          Case 11
+            boton11 = False
+        End Select
+      Endif
+      'si es del Joystick
+    Else If myevent And 2 Then
+      '******************Si Movemos el Joystick*************
+      'Si pulsamos ARRIBA
+      If number = 1 And value < 0 And Abs(value) > CalibrationZero Then
+        UpState = 1
+        Downstate = 0
+      End If
+      'Si pulsamos ABAJO
+      If number = 1 And value > 0 And Abs(value) > CalibrationZero Then
+        Downstate = 1
+        UpState = 0
+      End If
+      'Si pulsamos DERECHA
+      If number = 0 And value > 0 And Abs(value) > CalibrationZero Then
+        RightState = 1
+        LeftState = 0
+      End If
+      'Si pulsamos DERECHA
+      If number = 0 And value < 0 And Abs(value) > CalibrationZero Then
+        LeftState = 1
+        RightState = 0
+      End If
+      '*****************Si soltamos el joystick***************
+      If number = 1 And Abs(value) < CalibrationZero Then
+        UpState = 0
+        Downstate = 0
+      End If
+      If number = 0 And Abs(value) < CalibrationZero Then
+        RightState = 0
+        Leftstate = 0
+      End If
     Endif
-    'si es del Joystick
-  Else If myevent And 2 Then
-    '******************Si Movemos el Joystick*************
-    'Si pulsamos ARRIBA
-    If number = 1 And value < 0 And Abs(value) > CalibrationZero Then
-      UpState = 1
-      Downstate = 0
-    End If
-    'Si pulsamos ABAJO
-    If number = 1 And value > 0 And Abs(value) > CalibrationZero Then
-      Downstate = 1
-      UpState = 0
-    End If
-    'Si pulsamos DERECHA
-    If number = 0 And value > 0 And Abs(value) > CalibrationZero Then
-      RightState = 1
-      LeftState = 0
-    End If
-    'Si pulsamos DERECHA
-    If number = 0 And value < 0 And Abs(value) > CalibrationZero Then
-      LeftState = 1
-      RightState = 0
-    End If
-    '*****************Si soltamos el joystick***************
-    If number = 1 And Abs(value) < CalibrationZero Then
-      UpState = 0
-      Downstate = 0
-    End If
-    If number = 0 And Abs(value) < CalibrationZero Then
-      RightState = 0
-      Leftstate = 0
-    End If
-  Endif
 
-  Raise OnJoystick
+    Raise OnJoystick
+  Wend
 
 End
 
